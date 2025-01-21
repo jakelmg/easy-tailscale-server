@@ -1,0 +1,45 @@
+{
+  "ignition": {
+    "version": "3.3.0"
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/var/lib/iptables/rules-save",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/5SRQUvDMBSA7/0V7yw+SOcQ6S22EQubLVmGB/EQsojRbAnd8+C/l2ZRpthDTx+8932B8C5enCc7FFX70G8VNLLr4YlV7Lmo7jr5yGXza9Zt1ajxuha9ykPkcIrRgQ+Ab3l9ttiDCYcDDdq8A6KhI2myIMWKK9Fcio3it6t2cy+af+sIZOL4SALuYhgIFosJ92OX3ITsLsvrZTmhO7NP/ok4AukzWmBzg6u5wc3coPzzie8LoQNLrwwwAGnnj0Z7yybVcyXk8Eetu/W6VcVXAAAA//+5lh6yFwIAAA=="
+        },
+        "mode": 420
+      },
+      {
+        "overwrite": true,
+        "path": "/etc/flatcar/update.conf",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/wpydfL3D4kPDglyDHF1j7QtSk3Kzy/h8vF39g729QzxcImHqgj39HPxD48PDnEMCrE1MLIyMMCtyMfVzz3Ew9YwQwEOuAABAAD//xtak2VpAAAA"
+        },
+        "mode": 272
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "contents": "[Unit]\nDescription=Tailscale Docker Container\nAfter=docker.service\nRequires=docker.service\n\n[Service]\nExecStart=/usr/bin/docker run \\\n  --name tailscale \\\n  --rm \\\n  --hostname vpn-server \\\n  --network host \\\n  -e TS_AUTHKEY=\u003cENTER YOUR TAILSCALE AUTHKEY HERE!!!!!\u003e \\\n  -e TS_STATE_DIR=/var/lib/tailscale \\\n  -e TS_USERSPACE=false \\\n  -e TS_EXTRA_ARGS=\"--advertise-exit-node\" \\\n  -e TS_TAILSCALED_EXTRA_ARGS=\"--port=41641\" \\\n  -v tailscale:/var/lib/tailscale \\\n  --device=/dev/net/tun:/dev/net/tun \\\n  --cap-add=NET_ADMIN \\\n  ghcr.io/tailscale/tailscale:latest\nExecStop=/usr/bin/docker stop tailscale\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "tailscale.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Watchtower Docker Container Auto-Updater\nAfter=docker.service\nRequires=docker.service\n\n[Service]\nExecStart=/usr/bin/docker run \\\n  --name watchtower \\\n  --rm \\\n  -e WATCHTOWER_CLEANUP=true \\\n  -e WATCHTOWER_NO_RESTART=true \\\n  -v /var/run/docker.sock:/var/run/docker.sock \\\n  ghcr.io/containrrr/watchtower:latest\nExecStop=/usr/bin/docker stop watchtower\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "watchtower.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Restore iptables rules\nAfter=network.target\n\n[Service]\nType=oneshot\nExecStart=/sbin/iptables-restore -n /var/lib/iptables/rules-save\nRemainAfterExit=yes\n\n[Install]\nWantedBy=multi-user.target",
+        "enabled": true,
+        "name": "iptables-restore.service"
+      }
+    ]
+  }
+}

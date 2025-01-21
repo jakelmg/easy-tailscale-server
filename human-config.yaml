@@ -1,0 +1,98 @@
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /var/lib/iptables/rules-save
+      mode: 0644
+      contents:
+        inline: |
+          *filter
+          :INPUT DROP [0:0]
+          :FORWARD DROP [0:0]
+          :OUTPUT ACCEPT [0:0]
+          -A INPUT -i lo -j ACCEPT
+          -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+          -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+          -A INPUT -p udp -m udp --dport 41641 -j ACCEPT
+          -A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT
+          -A INPUT -p icmp -m icmp --icmp-type 3 -j ACCEPT
+          -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+          -A INPUT -p icmp -m icmp --icmp-type 11 -j ACCEPT
+          -A FORWARD -i eth0 -o tailscale0 -j ACCEPT
+          -A FORWARD -i tailscale0 -o eth0 -j ACCEPT
+          COMMIT
+    - path: /etc/flatcar/update.conf
+      overwrite: true
+      contents:
+        inline: |
+          REBOOT_STRATEGY=reboot
+          LOCKSMITHD_REBOOT_WINDOW_START=02:00
+          LOCKSMITHD_REBOOT_WINDOW_LENGTH=1h          
+      mode: 0420
+systemd:
+  units:
+    - name: tailscale.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Tailscale Docker Container
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        ExecStart=/usr/bin/docker run \
+          --name tailscale \
+          --rm \
+          --hostname vpn-server \
+          --network host \
+          -e TS_AUTHKEY=<ENTER YOUR TAILSCALE AUTHKEY HERE!!!!!> \
+          -e TS_STATE_DIR=/var/lib/tailscale \
+          -e TS_USERSPACE=false \
+          -e TS_EXTRA_ARGS="--advertise-exit-node" \
+          -e TS_TAILSCALED_EXTRA_ARGS="--port=41641" \
+          -v tailscale:/var/lib/tailscale \
+          --device=/dev/net/tun:/dev/net/tun \
+          --cap-add=NET_ADMIN \
+          ghcr.io/tailscale/tailscale:latest
+        ExecStop=/usr/bin/docker stop tailscale
+        Restart=always
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: watchtower.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Watchtower Docker Container Auto-Updater
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        ExecStart=/usr/bin/docker run \
+          --name watchtower \
+          --rm \
+          -e WATCHTOWER_CLEANUP=true \
+          -e WATCHTOWER_NO_RESTART=true \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          ghcr.io/containrrr/watchtower:latest
+        ExecStop=/usr/bin/docker stop watchtower
+        Restart=always
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: iptables-restore.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Restore iptables rules
+        After=network.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/sbin/iptables-restore -n /var/lib/iptables/rules-save
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
