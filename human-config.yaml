@@ -45,6 +45,7 @@ systemd:
           --rm \
           --hostname vpn-server \
           --network host \
+          --label com.centurylinklabs.watchtower.enable=true \
           -e TS_AUTHKEY=<ENTER YOUR TAILSCALE AUTHKEY HERE!!!!!> \
           -e TS_STATE_DIR=/var/lib/tailscale \
           -e TS_USERSPACE=false \
@@ -72,6 +73,7 @@ systemd:
         ExecStart=/usr/bin/docker run \
           --name watchtower \
           --rm \
+          -e WATCHTOWER_LABEL_ENABLE=true \
           -e WATCHTOWER_CLEANUP=true \
           -e WATCHTOWER_NO_RESTART=true \
           -v /var/run/docker.sock:/var/run/docker.sock \

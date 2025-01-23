@@ -2,7 +2,8 @@
 
 Ignition/Butane configuration file to deploy a firewalled Tailscale exit node as a personal VPN. 
 - Designed for use with Flatcar Container OS (may also work with Fedora CoreOS). 
-- Includes Watchtower to automatically update Tailscale. 
+- Automatic Tailscale updates (via Watchtower)
+- Automatic OS updates (via Flatcar)
 - Using Vultr's high frequency tier of VPS, you can achieve 1Gb/s VPN speeds for $6/m with 1TB of bandwidth.
 
 ### Instructions
