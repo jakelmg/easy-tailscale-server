@@ -6,7 +6,7 @@ Ignition/Butane configuration file to deploy a firewalled Tailscale exit node as
 - Automatic OS updates (via Flatcar)
 - Using Vultr's high frequency tier of VPS, you can achieve 1Gb/s VPN speeds for $6/m with 1TB of bandwidth.
 
-### Instructions
+## Instructions
 1. Create a free tailscale account
 2. Generate an auth key in your tailscale account
 3. Input the auth key into the system-config.ign
@@ -16,6 +16,26 @@ Ignition/Butane configuration file to deploy a firewalled Tailscale exit node as
 7. Open cmd/terminal and run `ping vpn-server` to make sure you can ping your server via Tailscale.
 8. Run `tailscale status` and make sure the connection shows "Direct" and not relayed. In 99% of situations, it shouldn't be possible for the connection to relay. If that happens, you may be dealing with an extremely restrictive or non standard firewall on the client.
 9. Once you've verified you have a working direct connection, right click on Tailscale in your device tray > Edit nodes > Select "`vpn-server`" to start tunneling your traffic through your new DIY VPN server :D
+
+## Deploying This on Other Cloud Providers
+Digital Ocean (easy & tested)
+- Upload Flatcar's official DigitalOcean image as a Custom Image
+  - [Instructions](https://docs.digitalocean.com/products/custom-images/getting-started/quickstart/)
+  - [Image](https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_digitalocean_image.bin.bz2)
+- Create a Droplet with the custom image while specifiying your SSH key, and pasting `machine-config.ign` into Advanced Options>Add Initialization scripts (free)
+
+OVH VPS (more difficult & untested)
+- Use Flatcar's community supported OpenStack (OVH compatible) image
+  - [Instructions](https://www.flatcar.org/docs/latest/installing/community-platforms/ovhcloud/)
+  - [Image](https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_openstack_image.img)
+- Must specify your own SSH key in the `human-config.yml` and regenerate the `system-config.ign` if you wish to be able to SSH into the VPS
+```
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ssh-rsa ABCD...
+```
 
 
 ### Making Edits to an Existing Instance
