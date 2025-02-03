@@ -21,12 +21,19 @@
         },
         "mode": 272
       }
+    ],
+    "links": [
+      {
+        "overwrite": true,
+        "path": "/etc/localtime",
+        "target": "/usr/share/zoneinfo/Etc/UTC"
+      }
     ]
   },
   "systemd": {
     "units": [
       {
-        "contents": "[Unit]\nDescription=Tailscale Docker Container\nAfter=docker.service\nRequires=docker.service\n\n[Service]\nExecStart=/usr/bin/docker run \\\n  --name tailscale \\\n  --rm \\\n  --hostname vpn-server \\\n  --network host \\\n  --label com.centurylinklabs.watchtower.enable=true \\\n  -e TS_AUTHKEY=\u003cENTER YOUR TAILSCALE AUTHKEY HERE!!!!!\u003e \\\n  -e TS_STATE_DIR=/var/lib/tailscale \\\n  -e TS_USERSPACE=false \\\n  -e TS_EXTRA_ARGS=\"--advertise-exit-node\" \\\n  -e TS_TAILSCALED_EXTRA_ARGS=\"--port=41641\" \\\n  -v tailscale:/var/lib/tailscale \\\n  --device=/dev/net/tun:/dev/net/tun \\\n  --cap-add=NET_ADMIN \\\n  ghcr.io/tailscale/tailscale:latest\nExecStop=/usr/bin/docker stop tailscale\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n",
+        "contents": "[Unit]\nDescription=Tailscale Docker Container\nAfter=docker.service\nRequires=docker.service\n\n[Service]\nExecStart=/usr/bin/docker run \\\n  --name tailscale \\\n  --rm \\\n  --hostname vpn-server \\\n  --network host \\\n  --label com.centurylinklabs.watchtower.enable=true \\\n  -e TS_AUTHKEY=ENTER_TAILSCALE_AUTH_KEY_HERE \\\n  -e TS_STATE_DIR=/var/lib/tailscale \\\n  -e TS_USERSPACE=false \\\n  -e TS_EXTRA_ARGS=\"--advertise-exit-node\" \\\n  -e TS_TAILSCALED_EXTRA_ARGS=\"--port=41641 --no-logs-no-support\" \\\n  -v tailscale:/var/lib/tailscale \\\n  --device=/dev/net/tun:/dev/net/tun \\\n  --cap-add=NET_ADMIN \\\n  ghcr.io/tailscale/tailscale:latest\nExecStop=/usr/bin/docker stop tailscale\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "tailscale.service"
       },

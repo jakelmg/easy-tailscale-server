@@ -6,6 +6,8 @@ Ignition/Butane configuration file to deploy a firewalled Tailscale exit node as
 - Automatic OS updates (via Flatcar)
 - Using Vultr's high frequency tier of VPS, you can achieve 1Gb/s VPN speeds for $6/m with 1TB of bandwidth.
 
+Configuration tool: https://jakelmg.github.io/tailscale-flatcar-config-tool/
+
 ## Instructions
 1. Create a free tailscale account
 2. Generate an auth key in your tailscale account

@@ -29,6 +29,10 @@ storage:
           LOCKSMITHD_REBOOT_WINDOW_START=02:00
           LOCKSMITHD_REBOOT_WINDOW_LENGTH=1h          
       mode: 0420
+  links:
+    - path: /etc/localtime
+      overwrite: true
+      target: /usr/share/zoneinfo/Etc/UTC
 systemd:
   units:
     - name: tailscale.service
@@ -46,11 +50,11 @@ systemd:
           --hostname vpn-server \
           --network host \
           --label com.centurylinklabs.watchtower.enable=true \
-          -e TS_AUTHKEY=<ENTER YOUR TAILSCALE AUTHKEY HERE!!!!!> \
+          -e TS_AUTHKEY=ENTER_TAILSCALE_AUTH_KEY_HERE \
           -e TS_STATE_DIR=/var/lib/tailscale \
           -e TS_USERSPACE=false \
           -e TS_EXTRA_ARGS="--advertise-exit-node" \
-          -e TS_TAILSCALED_EXTRA_ARGS="--port=41641" \
+          -e TS_TAILSCALED_EXTRA_ARGS="--port=41641 --no-logs-no-support" \
           -v tailscale:/var/lib/tailscale \
           --device=/dev/net/tun:/dev/net/tun \
           --cap-add=NET_ADMIN \
