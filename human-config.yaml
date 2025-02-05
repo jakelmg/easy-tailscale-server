@@ -12,7 +12,6 @@ storage:
           :OUTPUT ACCEPT [0:0]
           -A INPUT -i lo -j ACCEPT
           -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-          -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
           -A INPUT -p udp -m udp --dport 41641 -j ACCEPT
           -A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT
           -A INPUT -p icmp -m icmp --icmp-type 3 -j ACCEPT
