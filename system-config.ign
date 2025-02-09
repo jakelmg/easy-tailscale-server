@@ -8,7 +8,7 @@
         "path": "/var/lib/iptables/rules-save",
         "contents": {
           "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/5SRQUvDMBSA7/0V7yw+SOcQ6S22EQubLVmGB/EQsojRbAnd8+C/l2ZRpthDTx+8932B8C5enCc7FFX70G8VNLLr4YlV7Lmo7jr5yGXza9Zt1ajxuha9ykPkcIrRgQ+Ab3l9ttiDCYcDDdq8A6KhI2myIMWKK9Fcio3it6t2cy+af+sIZOL4SALuYhgIFosJ92OX3ITsLsvrZTmhO7NP/ok4AukzWmBzg6u5wc3coPzzie8LoQNLrwwwAGnnj0Z7yybVcyXk8Eetu/W6VcVXAAAA//+5lh6yFwIAAA=="
+          "source": "data:;base64,H4sIAAAAAAAC/5SQQUvEMBCF7/0VcxYHUlxEeotNxMKuKdksHsRDyEaMZjehOx7899JtlSr20NOD974vkLl4CZF8V1TNQ7szILRq4YlV7Lmo7pR+5Fr86tTO9Biva9masUQOg4wBYgJ8G+fJcACXjkfqrHsHREcnsuRByzU3UlzKreG362Z7L8W/doaPfe4fOQfuc+oIVuX1qpzBgzuc+SGxD6TP7IEtFa6WCjdLhfLPJ76vjgE8vTLABGRDPDkbPZtFp0gaxR+0VptNY4qvAAAA//9Y7QzJ6wEAAA=="
         },
         "mode": 420
       },
@@ -38,7 +38,7 @@
         "name": "tailscale.service"
       },
       {
-        "contents": "[Unit]\nDescription=Watchtower Docker Container Auto-Updater\nAfter=docker.service\nRequires=docker.service\n\n[Service]\nExecStart=/usr/bin/docker run \\\n  --name watchtower \\\n  --rm \\\n  -e WATCHTOWER_LABEL_ENABLE=true \\\n  -e WATCHTOWER_CLEANUP=true \\\n  -e WATCHTOWER_NO_RESTART=true \\\n  -v /var/run/docker.sock:/var/run/docker.sock \\\n  ghcr.io/containrrr/watchtower:latest\nExecStop=/usr/bin/docker stop watchtower\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n",
+        "contents": "[Unit]\nDescription=Watchtower Docker Container Auto-Updater\nAfter=docker.service\nRequires=docker.service\n\n[Service]\nExecStart=/usr/bin/docker run \\\n  --name watchtower \\\n  --rm \\\n  --label com.centurylinklabs.watchtower.enable=true \\\n  -e WATCHTOWER_LABEL_ENABLE=true \\\n  -e WATCHTOWER_CLEANUP=true \\\n  -e WATCHTOWER_NO_RESTART=true \\\n  -v /var/run/docker.sock:/var/run/docker.sock \\\n  ghcr.io/containrrr/watchtower:latest\nExecStop=/usr/bin/docker stop watchtower\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "watchtower.service"
       },

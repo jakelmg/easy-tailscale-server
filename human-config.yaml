@@ -76,6 +76,7 @@ systemd:
         ExecStart=/usr/bin/docker run \
           --name watchtower \
           --rm \
+          --label com.centurylinklabs.watchtower.enable=true \
           -e WATCHTOWER_LABEL_ENABLE=true \
           -e WATCHTOWER_CLEANUP=true \
           -e WATCHTOWER_NO_RESTART=true \
